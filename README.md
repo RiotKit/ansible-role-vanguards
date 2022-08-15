@@ -10,6 +10,7 @@ Installs [Vanguards](https://github.com/mikeperry-tor/vanguards) to protect your
 - Requires TOR to be installed
 - Recommended to use `ControlSocket` instead of `ControlPort` for security
 - Uses PyPy3 instead of Python3 for increased performance and reduced load
+- Tested on PyPy 3.6, PyPy 3.8 and Ubuntu 20.04
 
 ## Installing TOR
 
