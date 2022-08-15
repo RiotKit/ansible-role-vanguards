@@ -1,0 +1,12 @@
+[Unit]
+Description=Vanguards help guard you from getting vanned...
+After=tor.service
+After=network.target
+
+[Service]
+KillMode=process
+Restart=always
+ExecStart=pypy3 /usr/local/bin/vanguards/src/vanguards.py --config /etc/vanguards.conf
+
+[Install]
+WantedBy=multi-user.target

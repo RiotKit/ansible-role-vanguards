@@ -1,0 +1,4 @@
+version: master
+vanguards_conf:
+    control_socket: /run/tor/control
+

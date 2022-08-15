@@ -1,0 +1,59 @@
+- name: Install PyPy
+  package:
+      name: pypy3
+      state: present
+
+- name: Make sure GIT is installed
+  package:
+      name: git
+      state: present
+
+- block:
+      - name: Ensure PIP for PyPy3
+        shell: "pypy3 -m ensurepip"
+  rescue:
+      - name: Get PyPy3 version
+        shell: |
+            pypy3 -c 'import sys; print(str(sys.version_info[0])+"."+str(sys.version_info[1]))'
+        register: pypy3_version
+
+      - name: Download get-pip.py for selected Python version
+        get_url:
+            url: "https://bootstrap.pypa.io/pip/{{ pypy3_version.stdout }}/get-pip.py"
+            dest: "/tmp/get-pip.py"
+
+      - name: Install PIP using get-pip.py
+        shell: "pypy3 /tmp/get-pip.py"
+
+      - name: Clean up
+        file:
+            path: "/tmp/get-pip.py"
+            state: absent
+
+- name: Install STEM
+  shell: "pypy3 -m pip install stem"
+
+- name: Fetch from Git
+  git:
+    clone: true
+    repo: https://github.com/mikeperry-tor/vanguards.git
+    dest: /usr/local/bin/vanguards
+    separate_git_dir: /usr/local/src/vanguards
+    version: "{{ version | default('master') }}"
+    umask: "077"
+
+- name: Add vanguards configuration file
+  template:
+      src: vanguards.conf.j2
+      dest: /etc/vanguards.conf
+
+- name: Add a systemd service definition
+  template:
+      src: vanguards.service.j2
+      dest: /etc/systemd/system/vanguards.service
+
+- name: Enable systemd service
+  systemd:
+      name: vanguards
+      enabled: true
+      state: restarted
